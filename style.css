@@ -1,0 +1,199 @@
+/* ===== BASE STYLES ===== */
+* {
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+  overflow-x: hidden;
+}
+
+/* ===== BACKGROUND ===== */
+.background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d') no-repeat center center/cover;
+  filter: blur(10px);
+  z-index: -1;
+}
+
+/* ===== WEATHER CONTAINER ===== */
+.container {
+  background: rgba(255, 255, 255, 0.15);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 30px;
+  width: 90%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+  margin-top: 50px;
+}
+
+h1 {
+  margin-bottom: 10px;
+  font-weight: 600;
+  font-size: 28px;
+}
+
+.datetime {
+  font-size: 14px;
+  margin-bottom: 10px;
+  color: #eeeeee;
+}
+
+/* ===== INPUT AND BUTTONS ===== */
+.input-group {
+  display: flex;
+  justify-content: center;
+  margin: 15px 0;
+}
+
+input {
+  padding: 10px;
+  border: none;
+  border-radius: 10px 0 0 10px;
+  width: 70%;
+  outline: none;
+  font-size: 16px;
+}
+
+.input-group button {
+  padding: 10px 15px;
+  background-color: #3498db;
+  border: none;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  color: white;
+  font-size: 16px;
+  transition: 0.3s;
+}
+
+.input-group button:hover {
+  background-color: #2980b9;
+}
+
+.loc-btn, #toggleBtn {
+  margin-top: 10px;
+  padding: 8px 15px;
+  background: rgba(255, 255, 255, 0.2);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.3s;
+}
+
+.loc-btn:hover, #toggleBtn:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ===== WEATHER RESULTS ===== */
+#weatherResult {
+  margin-top: 20px;
+  font-size: 18px;
+}
+
+.weather-icon {
+  width: 80px;
+  height: 80px;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  margin-top: 40px;
+  text-align: center;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  font-size: 14px;
+  color: #ffffffb3;
+  width: 100%;
+  max-width: 500px;
+}
+
+/* ===== SOCIAL MEDIA ICONS - UPDATED ===== */
+/* Changed from original: 
+   - Increased z-index to 1000
+   - Added background with blur effect
+   - Improved hover states
+   - Better mobile responsiveness
+   - Fixed positioning issues */
+.social-icons-floating {
+  position: fixed;
+  top: 50%;
+  right: 20px;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  z-index: 1000; /* Increased from original */
+  background: rgba(255, 255, 255, 0.2); /* Added background */
+  padding: 15px 10px;
+  border-radius: 30px;
+  backdrop-filter: blur(5px); /* Added glass effect */
+}
+
+.social-icons-floating a {
+  color: white;
+  font-size: 20px;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s ease;
+  text-decoration: none; /* Added to remove underline */
+}
+
+.social-icons-floating a:hover {
+  transform: scale(1.2);
+  background: rgba(255, 255, 255, 0.3); /* Improved hover effect */
+}
+
+/* ===== RESPONSIVE DESIGN - UPDATED ===== */
+/* Changed from original:
+   - Better mobile layout for social icons
+   - Adjusted container spacing */
+@media (max-width: 768px) {
+  .social-icons-floating {
+    flex-direction: row; /* Changed from column */
+    top: auto;
+    bottom: 20px; /* Moved to bottom on mobile */
+    right: 50%;
+    transform: translateX(50%); /* Centered horizontally */
+    padding: 10px 15px;
+    border-radius: 40px; /* More oval shape on mobile */
+  }
+  
+  .container {
+    margin-top: 30px; /* Adjusted spacing */
+  }
+}
+
+/* ===== FONT AWESOME FALLBACK - NEW ===== */
+/* Added this new section to handle icon loading issues */
+@font-face {
+  font-family: 'Font Awesome';
+  font-style: normal;
+  font-weight: 900;
+  src: url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/webfonts/fa-solid-900.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.5.0/webfonts/fa-solid-900.woff2') format('woff2');
+}
+
+.fab, .fas {
+  font-family: 'Font Awesome', sans-serif; /* Ensures icons display even if CDN fails */
+}

@@ -1,0 +1,651 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Pulse Pro</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: 'Poppins', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: linear-gradient(120deg, #89f7fe 0%, #66a6ff 100%);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: white;
+      overflow-x: hidden;
+      transition: background 0.5s ease;
+    }
+
+    body.night-mode {
+      background: linear-gradient(120deg, #0f2027 0%, #203a43 50%, #2c5364 100%);
+    }
+
+    /* Welcome Screen Styles */
+    #welcomeScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      transition: opacity 1s ease-out;
+    }
+
+    #welcomeScreen h1 {
+      font-size: 3rem;
+      margin-bottom: 20px;
+      text-align: center;
+      animation: pulse 2s infinite;
+    }
+
+    #welcomeScreen p {
+      font-size: 1.2rem;
+      max-width: 80%;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .loading-bar {
+      width: 200px;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.3);
+      border-radius: 2px;
+      overflow: hidden;
+    }
+
+    .loading-progress {
+      height: 100%;
+      width: 0;
+      background: white;
+      animation: load 5s linear forwards;
+    }
+
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes load {
+      0% { width: 0; }
+      100% { width: 100%; }
+    }
+
+    /* Rest of your existing CSS */
+    .background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: url('https://images.unsplash.com/photo-1504384308090-c894fdcc538d') no-repeat center center/cover;
+      filter: blur(10px);
+      z-index: -1;
+      opacity: 0.7;
+      transition: opacity 0.5s ease;
+    }
+
+    .night-mode .background {
+      background: url('https://images.unsplash.com/photo-1534796636912-3b95b3ab5986') no-repeat center center/cover;
+      opacity: 0.5;
+    }
+
+    .container {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 20px;
+      padding: 30px;
+      width: 90%;
+      max-width: 450px;
+      text-align: center;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
+      margin-top: 30px;
+      transition: all 0.3s ease;
+      display: none; /* Initially hidden */
+    }
+
+    h1 {
+      margin-bottom: 10px;
+      font-weight: 600;
+      font-size: 28px;
+    }
+
+    .datetime {
+      font-size: 14px;
+      margin-bottom: 10px;
+      color: #eeeeee;
+    }
+
+    .input-group {
+      display: flex;
+      justify-content: center;
+      margin: 15px 0;
+    }
+
+    input {
+      padding: 12px;
+      border: none;
+      border-radius: 10px 0 0 10px;
+      width: 70%;
+      outline: none;
+      font-size: 16px;
+      background: rgba(255, 255, 255, 0.8);
+    }
+
+    .input-group button {
+      padding: 12px 15px;
+      background-color: #3498db;
+      border: none;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+      color: white;
+      font-size: 16px;
+      transition: 0.3s;
+    }
+
+    .input-group button:hover {
+      background-color: #2980b9;
+    }
+
+    .loc-btn, #toggleBtn {
+      margin-top: 10px;
+      padding: 10px 15px;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 10px;
+      color: white;
+      cursor: pointer;
+      font-weight: 500;
+      transition: background 0.3s;
+    }
+
+    .loc-btn:hover, #toggleBtn:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    #weatherResult {
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .weather-card {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      padding: 20px;
+      margin-top: 15px;
+      backdrop-filter: blur(5px);
+    }
+
+    .weather-icon {
+      width: 100px;
+      height: 100px;
+      margin: -10px 0;
+    }
+
+    .weather-temp {
+      font-size: 3rem;
+      font-weight: 700;
+      margin: 5px 0;
+    }
+
+    .weather-details {
+      display: flex;
+      justify-content: space-around;
+      margin: 15px 0;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .detail-item i {
+      margin-bottom: 5px;
+      font-size: 1.2rem;
+    }
+
+    .aqi-indicator {
+      display: inline-block;
+      padding: 5px 10px;
+      border-radius: 20px;
+      font-weight: 500;
+      margin-top: 5px;
+    }
+
+    .aqi-good {
+      background-color: rgba(0, 200, 83, 0.7);
+    }
+
+    .aqi-moderate {
+      background-color: rgba(255, 171, 0, 0.7);
+    }
+
+    .aqi-unhealthy {
+      background-color: rgba(229, 57, 53, 0.7);
+    }
+
+    .aqi-very-unhealthy {
+      background-color: rgba(156, 39, 176, 0.7);
+    }
+
+    .aqi-hazardous {
+      background-color: rgba(124, 77, 255, 0.7);
+    }
+
+    .sun-moon {
+      position: relative;
+      height: 60px;
+      margin: 15px 0;
+    }
+
+    .sun, .moon {
+      position: absolute;
+      font-size: 2rem;
+      transition: all 0.5s ease;
+    }
+
+    .sun {
+      color: #FFD700;
+      left: 30%;
+      opacity: 0;
+    }
+
+    .moon {
+      color: #E0E0E0;
+      right: 30%;
+      opacity: 0;
+    }
+
+    .visible {
+      opacity: 1;
+    }
+
+    .social-icons-floating {
+      position: fixed;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+      z-index: 1000;
+      background: rgba(255, 255, 255, 0.2);
+      padding: 15px 10px;
+      border-radius: 30px;
+      backdrop-filter: blur(5px);
+    }
+
+    .social-icons-floating a {
+      color: white;
+      font-size: 20px;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      transition: all 0.3s ease;
+      text-decoration: none;
+    }
+
+    .social-icons-floating a:hover {
+      transform: scale(1.2);
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .footer {
+      margin-top: 20px;
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      font-size: 14px;
+      color: #ffffffb3;
+      width: 90%;
+      max-width: 500px;
+      margin-bottom: 20px;
+      display: none; /* Initially hidden */
+    }
+
+    @media (max-width: 768px) {
+      .social-icons-floating {
+        flex-direction: row;
+        top: auto;
+        bottom: 20px;
+        right: 50%;
+        transform: translateX(50%);
+        padding: 10px 15px;
+        border-radius: 40px;
+      }
+      
+      .container {
+        margin-top: 20px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Welcome Screen -->
+  <div id="welcomeScreen">
+    <h1>Welcome to Weather Pulse Pro</h1>
+    <p>Your complete weather forecasting system with real-time updates and accurate predictions</p>
+    <p>Hello! Here's Your Personal Forecast Assistants</p>
+    <div class="loading-bar">
+      <div class="loading-progress"></div>
+    </div>
+  </div>
+
+  <!-- Main App Content (initially hidden) -->
+  <div class="background"></div>
+
+  <div class="container glass">
+    <h1>🌤 Weather Pulse Pro</h1>
+    <div class="datetime" id="datetime"></div>
+
+    <div class="input-group">
+      <input type="text" id="cityInput" placeholder="Enter City" />
+      <button onclick="getWeather()">🔍</button>
+    </div>
+
+    <button class="loc-btn" onclick="getLocationWeather()">📍 Use My Location</button>
+    
+    <div class="sun-moon">
+      <div class="sun">☀️</div>
+      <div class="moon">🌙</div>
+    </div>
+    
+    <div id="weatherResult"></div>
+    <button id="toggleBtn" onclick="toggleTemp()" style="display: none;">Switch to °F</button>
+  </div>
+
+  <div class="social-icons-floating">
+    <a href="https://www.linkedin.com/in/srijan-roy-29bb19256" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin-in"></i></a>
+    <a href="https://github.com/SrijanRoy12" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+    <a href="mailto:roysrijan53@gmail.com" target="_blank" aria-label="Email"><i class="fas fa-envelope"></i></a>
+    <a href="https://www.instagram.com/its_ur_roy123/" target="_blank" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+    <a href="https://x.com/home" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+  </div>
+
+  <footer class="footer">
+    <p><strong>Designed & Engineered by</strong> <strong>Srijan Roy</strong><br>IEM Kolkata</p>
+  </footer>
+
+  <script>
+    // API Keys
+    const WEATHER_API_KEY = 'b7e425cd1ef9cb8a1699d7f51646c6b5';
+    const AQI_API_KEY = 'b66d0a0e7aa5e2938a40c4d71b0daba6f799981d';
+
+    // DOM Elements
+    const cityInput = document.getElementById('cityInput');
+    const weatherResult = document.getElementById('weatherResult');
+    const toggleBtn = document.getElementById('toggleBtn');
+    const sunElement = document.querySelector('.sun');
+    const moonElement = document.querySelector('.moon');
+    const bodyElement = document.body;
+    const backgroundElement = document.querySelector('.background');
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    const container = document.querySelector('.container');
+    const footer = document.querySelector('.footer');
+
+    // Show welcome screen first, then main app after 5 seconds
+    window.addEventListener('load', () => {
+      setTimeout(() => {
+        welcomeScreen.style.opacity = '0';
+        setTimeout(() => {
+          welcomeScreen.style.display = 'none';
+          container.style.display = 'block';
+          footer.style.display = 'block';
+        }, 1000);
+      }, 5000);
+    });
+
+    // Time of Day Detection
+    function updateDayNightDisplay(sunrise, sunset) {
+      const now = new Date();
+      const currentTime = now.getTime() / 1000;
+      
+      sunElement.classList.remove('visible');
+      moonElement.classList.remove('visible');
+      bodyElement.classList.remove('night-mode');
+      
+      if (currentTime > sunrise && currentTime < sunset) {
+        // Daytime
+        sunElement.classList.add('visible');
+        bodyElement.classList.remove('night-mode');
+      } else {
+        // Nighttime
+        moonElement.classList.add('visible');
+        bodyElement.classList.add('night-mode');
+      }
+    }
+
+    // Get Weather Data
+    async function getWeather() {
+      const city = cityInput.value.trim();
+      if (!city) {
+        alert('Please enter a city name');
+        return;
+      }
+
+      try {
+        // Fetch weather data
+        const weatherResponse = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&units=metric&appid=${WEATHER_API_KEY}`
+        );
+        const weatherData = await weatherResponse.json();
+        
+        if (weatherData.cod !== 200) {
+          throw new Error(weatherData.message || 'Failed to fetch weather data');
+        }
+
+        // Fetch AQI data (using OpenWeather's Air Pollution API)
+        const aqiResponse = await fetch(
+          `http://api.openweathermap.org/data/2.5/air_pollution?lat=${weatherData.coord.lat}&lon=${weatherData.coord.lon}&appid=${WEATHER_API_KEY}`
+        );
+        const aqiData = await aqiResponse.json();
+
+        displayWeather(weatherData, aqiData);
+      } catch (error) {
+        weatherResult.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+        console.error('Error fetching weather data:', error);
+      }
+    }
+
+    // Display Weather Data
+    function displayWeather(weatherData, aqiData) {
+      const { name, sys, main, weather, wind, clouds, dt, timezone } = weatherData;
+      const { country, sunrise, sunset } = sys;
+      const { temp, feels_like, humidity, pressure } = main;
+      const { description, icon } = weather[0];
+      const { speed } = wind;
+      const { all } = clouds;
+      
+      // Get AQI level
+      const aqiLevel = aqiData.list[0].main.aqi;
+      const aqiText = getAQIDescription(aqiLevel);
+      const aqiClass = getAQIClass(aqiLevel);
+      
+      // Update day/night display
+      updateDayNightDisplay(sunrise, sunset);
+      
+      // Convert timezone offset to hours
+      const timezoneHours = timezone / 3600;
+      const timezoneString = `UTC${timezoneHours >= 0 ? '+' : ''}${timezoneHours}`;
+      
+      // Display all data
+      weatherResult.innerHTML = `
+        <div class="weather-card">
+          <h2>${name}, ${country}</h2>
+          <img src="https://openweathermap.org/img/wn/${icon}@2x.png" class="weather-icon" alt="${description}">
+          <div class="weather-temp">${Math.round(temp)}°C</div>
+          <p>${description.charAt(0).toUpperCase() + description.slice(1)}</p>
+          
+          <div class="weather-details">
+            <div class="detail-item">
+              <i class="fas fa-temperature-low"></i>
+              <span>${Math.round(feels_like)}°C</span>
+              <small>Feels like</small>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-tint"></i>
+              <span>${humidity}%</span>
+              <small>Humidity</small>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-wind"></i>
+              <span>${speed} m/s</span>
+              <small>Wind</small>
+            </div>
+          </div>
+          
+          <div class="weather-details">
+            <div class="detail-item">
+              <i class="fas fa-cloud"></i>
+              <span>${all}%</span>
+              <small>Clouds</small>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-compress-alt"></i>
+              <span>${pressure} hPa</span>
+              <small>Pressure</small>
+            </div>
+            <div class="detail-item">
+              <i class="fas fa-globe"></i>
+              <span>${timezoneString}</span>
+              <small>Timezone</small>
+            </div>
+          </div>
+          
+          <div style="margin-top: 15px;">
+            <i class="fas fa-smog"></i> Air Quality: 
+            <span class="aqi-indicator ${aqiClass}">${aqiText} (${aqiLevel})</span>
+          </div>
+        </div>
+      `;
+      
+      toggleBtn.style.display = 'block';
+    }
+
+    // Get AQI Description
+    function getAQIDescription(aqi) {
+      switch(aqi) {
+        case 1: return 'Good';
+        case 2: return 'Fair';
+        case 3: return 'Moderate';
+        case 4: return 'Poor';
+        case 5: return 'Very Poor';
+        default: return 'Unknown';
+      }
+    }
+
+    // Get AQI CSS Class
+    function getAQIClass(aqi) {
+      switch(aqi) {
+        case 1: return 'aqi-good';
+        case 2: return 'aqi-moderate';
+        case 3: return 'aqi-unhealthy';
+        case 4: return 'aqi-very-unhealthy';
+        case 5: return 'aqi-hazardous';
+        default: return '';
+      }
+    }
+
+    // Get Weather by Location
+    function getLocationWeather() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            
+            try {
+              // Fetch weather data by coordinates
+              const weatherResponse = await fetch(
+                `https://api.openweathermap.org/data/2.5/weather?lat=${latitude}&lon=${longitude}&units=metric&appid=${WEATHER_API_KEY}`
+              );
+              const weatherData = await weatherResponse.json();
+              
+              // Fetch AQI data
+              const aqiResponse = await fetch(
+                `http://api.openweathermap.org/data/2.5/air_pollution?lat=${latitude}&lon=${longitude}&appid=${WEATHER_API_KEY}`
+              );
+              const aqiData = await aqiResponse.json();
+              
+              displayWeather(weatherData, aqiData);
+              cityInput.value = weatherData.name;
+            } catch (error) {
+              weatherResult.innerHTML = `<p class="error">Error: ${error.message}</p>`;
+              console.error('Error fetching weather data:', error);
+            }
+          },
+          (error) => {
+            alert('Error getting location: ' + error.message);
+          }
+        );
+      } else {
+        alert('Geolocation is not supported by your browser');
+      }
+    }
+
+    // Toggle Temperature Unit
+    function toggleTemp() {
+      const tempElement = document.querySelector('.weather-temp');
+      if (!tempElement) return;
+      
+      const currentTemp = tempElement.textContent;
+      if (currentTemp.includes('°C')) {
+        const celsius = parseFloat(currentTemp);
+        const fahrenheit = (celsius * 9/5) + 32;
+        tempElement.textContent = `${Math.round(fahrenheit)}°F`;
+        toggleBtn.textContent = 'Switch to °C';
+      } else {
+        const fahrenheit = parseFloat(currentTemp);
+        const celsius = (fahrenheit - 32) * 5/9;
+        tempElement.textContent = `${Math.round(celsius)}°C`;
+        toggleBtn.textContent = 'Switch to °F';
+      }
+    }
+
+    // Update Date and Time
+    function updateDateTime() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      document.getElementById('datetime').textContent = now.toLocaleDateString('en-US', options);
+    }
+
+    // Initialize
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Allow pressing Enter in input field
+    cityInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        getWeather();
+      }
+    });
+  </script>
+</body>
+</html>
